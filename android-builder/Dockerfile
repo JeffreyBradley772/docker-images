@@ -31,16 +31,32 @@ RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477
     mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
     rm cmdline-tools.zip
 
+# Download and install Gradle
+# Using Gradle 7.5.1 which is compatible with Android Gradle Plugin 7.4.2
+RUN mkdir -p /opt/gradle && \
+    wget https://services.gradle.org/distributions/gradle-7.5.1-bin.zip -P /tmp && \
+    unzip -d /opt /tmp/gradle-7.5.1-bin.zip && \
+    ln -s /opt/gradle-7.5.1 /opt/gradle && \
+    rm /tmp/gradle-7.5.1-bin.zip
+
+# Set Gradle environment variables
+ENV GRADLE_HOME=/opt/gradle/gradle-7.5.1
+ENV PATH=${PATH}:${GRADLE_HOME}/bin
+
 # Accept licenses
 RUN yes | sdkmanager --licenses
 
-# Install basic Android SDK packages
+# Install Android SDK components
 RUN sdkmanager \
-    "platform-tools" \
     "build-tools;34.0.0" \
-    "platforms;android-34"
+    "platforms;android-34" \
+    "extras;google;m2repository" \
+    "extras;android;m2repository"
 
-# Switch back to the non-root user
+# Create a non-root user with a home directory
+RUN useradd -m -d /home/android-builder -s /bin/bash android-builder
+
+# Switch to the non-root user
 USER android-builder
 
 # Set working directory

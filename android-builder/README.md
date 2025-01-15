@@ -21,6 +21,32 @@ docker build --build-arg BASE_IMAGE=$(Get-Content base.env | ForEach-Object { $_
 docker build --build-arg BASE_IMAGE=$(cat base.env | cut -d'=' -f2) -t android-builder .
 ```
 
+## Running the Image
+
+If you want to run the image to do something, you can run the following command:
+
+```bash
+docker run -it --rm android-builder
+```
+
+To run the image and use Gradle, you'll need to mount your project directory. For example:
+
+```bash
+docker run -it --rm -v ${PWD}:/workspace -w /workspace android-builder
+```
+
+This will:
+- Mount your current directory to `/workspace` in the container
+- Set the working directory to `/workspace`
+- Give you an interactive shell where you can run Gradle commands
+
+Example Gradle commands you can run:
+```bash
+gradle --version  # Check gradle version
+./gradlew build  # Build your project (if using Gradle wrapper)
+gradle build     # Build your project (using container's Gradle)
+```
+
 ## Note
 - The `base.env` file is ignored by Git to keep the base image information private
 - Make sure you have access to the base image repository before building
