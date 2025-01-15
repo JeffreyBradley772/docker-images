@@ -1,0 +1,2 @@
+# Ignore base image configuration files in all subdirectories
+**/base.env
