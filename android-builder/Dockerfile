@@ -23,6 +23,7 @@ RUN dnf update -y && \
     gcc-c++ \
     make \
     openssl-devel \
+    ninja-build \
     && dnf clean all
 
 # Install CMake 3.22.1
@@ -38,12 +39,17 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1
 # Create Android SDK directory
 RUN mkdir -p ${ANDROID_HOME}
 
+# Create a non-root user with a home directory
+RUN useradd -m -d /home/android-builder -s /bin/bash android-builder
+
 # Download and install Android Command Line Tools
 RUN wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip && \
     mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     unzip -q cmdline-tools.zip -d ${ANDROID_HOME}/cmdline-tools && \
     mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
-    rm cmdline-tools.zip
+    rm cmdline-tools.zip && \
+    chown -R android-builder:android-builder ${ANDROID_HOME} && \
+    chmod -R 775 ${ANDROID_HOME}
 
 # Download and install Gradle
 # Using Gradle 7.5.1 which is compatible with Android Gradle Plugin 7.4.2
@@ -63,12 +69,13 @@ RUN yes | sdkmanager --licenses
 # Install Android SDK components
 RUN sdkmanager \
     "build-tools;34.0.0" \
+    "build-tools;30.0.3" \
     "platforms;android-34" \
+    "platforms;android-33" \
     "extras;google;m2repository" \
-    "extras;android;m2repository"
-
-# Create a non-root user with a home directory
-RUN useradd -m -d /home/android-builder -s /bin/bash android-builder
+    "extras;android;m2repository" \
+    "ndk;25.2.9519653" \
+    "ndk;23.1.7779620"
 
 # Switch to the non-root user
 USER android-builder
