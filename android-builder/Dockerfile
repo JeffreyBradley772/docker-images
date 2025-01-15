@@ -19,7 +19,21 @@ RUN dnf update -y && \
     unzip \
     which \
     git \
+    gcc \
+    gcc-c++ \
+    make \
+    openssl-devel \
     && dnf clean all
+
+# Install CMake 3.22.1
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && \
+    tar -zxvf cmake-3.22.1.tar.gz && \
+    cd cmake-3.22.1 && \
+    ./bootstrap && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf cmake-3.22.1 cmake-3.22.1.tar.gz
 
 # Create Android SDK directory
 RUN mkdir -p ${ANDROID_HOME}
