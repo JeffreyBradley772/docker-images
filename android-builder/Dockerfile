@@ -2,9 +2,6 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-# Set maintainer label
-LABEL maintainer="Higher Ground"
-
 # Set environment variables
 ENV ANDROID_HOME=/opt/android-sdk
 ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools
